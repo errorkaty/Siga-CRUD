@@ -1,0 +1,19 @@
+=== SIGA - Atividade CRUD e Etapa 1 ===
+
+Cadastrado: 2026001 - Maria Silva (média 8.5)
+Cadastrado: 2026002 - João Souza (média 6.0)
+Não foi possível cadastrar: Já existe aluno com a matrícula 2026001.
+Consulta: 2026001 - Maria Silva (média 8.5)
+Não foi possível consultar: Aluno não encontrado: 0000000.
+
+Listagem após alterar a cópia retornada:
+  2026001 - Maria Silva (média 8.5)
+  2026002 - João Souza (média 6.0)
+Alterado: 2026001 - Maria Silva (média 9.0)
+Não foi possível alterar: Aluno não encontrado: 0000000.
+Matrícula removida: 2026002
+Não foi possível remover: Aluno não encontrado: 0000000.
+Não foi possível cadastrar: Média deve estar entre 0 e 10.
+
+Alunos ao final:
+  2026001 - Maria Silva (média 9.0)

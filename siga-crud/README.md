@@ -1,68 +1,93 @@
-# SIGA — Atividade de CRUD completo e Etapa 1 (código inicial)
+# SIGA — Atividade de CRUD completo e Etapa 1
 
 **Técnicas de Programação II (TP2) · Aula 8** — CST em Desenvolvimento de Software Multiplataforma · Fatec de Porto Ferreira
 
-Este é o **código inicial** da atividade prática da Aula 8. O CRUD está **incompleto** e o código contém **três deslizes propositais**, que você deverá corrigir. Ao final, este projeto compõe a entrega da **Etapa 1 do Projeto Integrador**.
+Este projeto implementa as quatro operações do CRUD para alunos, separando a apresentação, as regras de negócio e o acesso aos dados em memória.
 
-## Estrutura do projeto
+## Estrutura
 
 ```
 siga-crud/
-└── src/
-    └── siga/
-        ├── Aluno.java             (entidade de domínio; pronta)
-        ├── AlunoDAO.java          (interface do DAO, da Aula 7; pronta)
-        ├── AlunoDAOMemoria.java   (CRUD incompleto + deslizes 1 e 2)
-        ├── ServicoAluno.java      (camada de serviço incompleta + deslize 3)
-        └── Main.java              (apresentação; demonstra os deslizes)
+├── src/siga/
+│   ├── Aluno.java
+│   ├── AlunoDAO.java
+│   ├── AlunoDAOMemoria.java
+│   ├── ServicoAluno.java
+│   └── Main.java
+└── README.md
 ```
 
 ## Como compilar e executar
 
-Pré-requisito: JDK 17 ou superior (`java -version` para verificar).
+Pré-requisito: JDK 17 ou superior.
+
+Na raiz do repositório, execute:
 
 ```bash
-# 1. Compilar (a saída vai para a pasta "bin")
-javac -d bin src/siga/*.java
-
-# 2. Executar
+javac -encoding UTF-8 -d bin siga-crud/src/siga/*.java
 java -cp bin siga.Main
 ```
 
-Execute e observe a saída: ela **demonstra os três deslizes acontecendo**.
+No VS Code, abra o repositório e execute o método `main` do arquivo `siga-crud/src/siga/Main.java` com o suporte a Java instalado.
 
-## O que está incompleto
+## Etapa 1 — CRUD completo
 
-| Local | Situação |
+`AlunoDAO` define as operações de inserir, buscar por matrícula, listar, atualizar e remover. `AlunoDAOMemoria` guarda os alunos em um `Map`, cuja chave é a matrícula.
+
+| Operação | Comportamento |
 |---|---|
-| `AlunoDAOMemoria.inserir` | Não impede matrícula duplicada |
-| `AlunoDAOMemoria.atualizar` | Não implementado (lança `UnsupportedOperationException`) |
-| `ServicoAluno` | Faltam `consultar`, `alterar` e `excluir` |
+| Criar | Impede o cadastro de matrícula duplicada. |
+| Consultar | Busca um aluno pela matrícula e informa quando não existe. |
+| Listar | Devolve uma cópia da lista de alunos. |
+| Alterar | Atualiza somente um aluno já cadastrado. |
+| Excluir | Remove somente uma matrícula existente. |
 
-## Os três deslizes propositais
+## Etapa 2 — Camada de serviço
 
-| # | Deslize | Onde | Por que é um problema |
-|---|---|---|---|
-| 1 | **Coleção interna exposta** | `AlunoDAOMemoria.listarTodos` | Devolve a própria lista interna; a tela consegue inserir um aluno sem passar pelo serviço, quebrando o encapsulamento. |
-| 2 | **Exclusão silenciosa** | `AlunoDAOMemoria.remover` | Não verifica se o registro existia; o usuário recebe confirmação de uma operação que não ocorreu. |
-| 3 | **Validação duplicada e divergente** | `ServicoAluno` e `Main` | A regra da média está nos dois lugares, com limites diferentes (0..10 e 0..100). Regra duplicada diverge com o tempo. |
+`ServicoAluno` concentra as operações usadas pela apresentação: `cadastrar`, `consultar`, `listar`, `alterar` e `excluir`. A validação fica no método privado `validar(Aluno)`, reutilizado no cadastro e na alteração.
 
-## Sua tarefa
+As regras aplicadas são:
 
-Siga as etapas da ficha de atividade prática:
+- nome obrigatório;
+- matrícula obrigatória;
+- média entre 0 e 10.
 
-1. **Completar o CRUD** no `AlunoDAOMemoria`: impedir matrícula duplicada em `inserir` e implementar `atualizar`, verificando a existência do registro.
-2. **Implementar a camada de serviço**: `consultar`, `alterar` e `excluir` no `ServicoAluno`, extraindo a validação para um método privado `validar(Aluno)` reutilizado pelas operações.
-3. **Corrigir os três deslizes**: cópia defensiva em `listarTodos`, verificação de existência em `remover` e eliminação da validação duplicada na apresentação (a regra do domínio fica **apenas** no serviço).
-4. **Tratar as exceções** na camada de apresentação, com mensagens claras e específicas — e sem blocos `catch` vazios.
-5. **Consolidar a Etapa 1** no repositório, com README e commits descritivos.
+Com isso, a apresentação não replica as regras de domínio.
 
-## Critério de sucesso
+## Etapa 3 — Correções realizadas
 
-Ao final: (a) as **quatro operações** do CRUD funcionam; (b) a regra da média existe em **um único lugar**; (c) a tela **não consegue** alterar a coleção interna do DAO; e (d) excluir uma matrícula inexistente produz **mensagem de erro**, não de sucesso.
+### Coleção protegida
 
-## Padrão de entrega
+`listarTodos` cria uma nova lista a cada chamada. Alterar a lista recebida pela apresentação não altera o armazenamento interno do DAO.
 
-Conforme a ficha de atividade prática: identificadores em português, um arquivo `.java` por classe pública, código formatado, entrega no repositório Git com README e commits descritivos. O uso de IA para gerar o código é proibido nesta atividade (ver seção 5.3 da ficha).
+### Exclusão verificada
 
-> **Etapa 1 do Projeto Integrador:** além desta atividade, a entrega inclui o modelo de domínio, o diagrama de classes, ao menos um padrão criacional justificado e a documentação das decisões de design. Consulte a Seção 10 da apostila da Aula 8.
+`remover` lança uma exceção quando a matrícula não está cadastrada. A apresentação informa o erro e não confirma uma exclusão que não ocorreu.
+
+### Validação centralizada
+
+A regra da média existe apenas no serviço. O `Main` fornece os dados ao serviço e apresenta a mensagem recebida quando uma operação falha.
+
+## Etapa 4 — Tratamento de exceções
+
+O `Main` captura as exceções de cadastro, consulta, alteração e exclusão. Cada caso mostra uma mensagem específica ao usuário. Não há blocos `catch` vazios.
+
+## Demonstração
+
+A execução demonstra:
+
+1. cadastro de Maria Silva e João Souza;
+2. bloqueio de matrícula duplicada;
+3. consulta existente e inexistente;
+4. alteração existente e inexistente;
+5. exclusão existente e inexistente;
+6. rejeição de média fora do intervalo;
+7. cópia defensiva na listagem.
+
+A saída está disponível em [docs/execucao.txt](../docs/execucao.txt).
+
+## Decisões de design
+
+A entidade `Aluno` representa os dados acadêmicos. `ServicoAluno` aplica as regras do domínio e usa a abstração `AlunoDAO`, evitando dependência direta da implementação de memória. `AlunoDAOMemoria` fica responsável apenas pelo armazenamento e pelas garantias de integridade da coleção.
+
+Essa organização mantém as responsabilidades separadas: a apresentação interage com quem executa o programa, o serviço coordena as regras e o DAO persiste os dados.
